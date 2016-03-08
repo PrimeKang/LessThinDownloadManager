@@ -2,8 +2,6 @@ package com.thin.downloadmanager;
 
 import android.os.Handler;
 
-import java.security.InvalidParameterException;
-
 public class ThinDownloadManager implements DownloadManager {
 
     /** Download request queue takes care of handling the request based on priority. */
@@ -21,8 +19,9 @@ public class ThinDownloadManager implements DownloadManager {
      * Construct with provided callback handler
      *
      * @param callbackHandler
+     * @throws IllegalArgumentException
      */
-    public ThinDownloadManager(Handler callbackHandler) throws InvalidParameterException {
+    public ThinDownloadManager(Handler callbackHandler) throws IllegalArgumentException {
         mRequestQueue = new DownloadRequestQueue(callbackHandler);
         mRequestQueue.start();
     }

@@ -3,7 +3,6 @@ package com.thin.downloadmanager;
 import android.os.Handler;
 import android.os.Looper;
 
-import java.security.InvalidParameterException;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.Executor;
@@ -109,10 +108,11 @@ public class DownloadRequestQueue {
 	 * Construct with provided callback handler.
 	 *
 	 * @param callbackHandler
+	 * @throws IllegalArgumentException
 	 */
-	public DownloadRequestQueue(Handler callbackHandler) throws InvalidParameterException {
+	public DownloadRequestQueue(Handler callbackHandler) throws IllegalArgumentException {
 		if (callbackHandler == null) {
-			throw new InvalidParameterException("callbackHandler must not be null");
+			throw new IllegalArgumentException("callbackHandler cannot be null");
 		}
 
 		initialize(callbackHandler);
