@@ -70,6 +70,11 @@ public interface DownloadManager {
 	int ERROR_DOWNLOAD_SIZE_UNKNOWN = 1006;
 
 	/**
+	 * Error code when WiFi network becomes unavailable while creating connection
+	 */
+	public final static int ERROR_WIFI_UNAVAILABLE = 1007;
+
+	/**
 	 * Error code when passed URI is malformed.
 	 */
 	int ERROR_MALFORMED_URI = 1007;

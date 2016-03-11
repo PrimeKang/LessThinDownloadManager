@@ -49,6 +49,18 @@ bintray {
     }
 }
 
+task deleteJar(type: Delete) {
+    delete 'libs/thindldman.jar'
+}
+
+task createJar(type: Copy) {
+    from('build/intermediates/bundles/debug/')
+    into('libs/')
+    include('classes.jar')
+    rename('classes.jar', 'thindldman.jar')
+}
+
+createJar.dependsOn(deleteJar, assembleDebug)
 
 install {
     repositories.mavenInstaller {

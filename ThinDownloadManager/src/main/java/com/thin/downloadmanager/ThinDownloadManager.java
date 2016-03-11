@@ -94,6 +94,9 @@ public class ThinDownloadManager implements DownloadManager {
         if (!isReleased()) {
             mRequestQueue.release();
             mRequestQueue = null;
+            if (NetworkHelper.sWifiLock != null) {
+                NetworkHelper.sWifiLock.release();
+            }
         }
     }
 

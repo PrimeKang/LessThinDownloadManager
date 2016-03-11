@@ -116,7 +116,18 @@ class DownloadDispatcher extends Thread {
         HttpURLConnection conn = null;
 
         try {
-            conn = (HttpURLConnection) url.openConnection();
+            if (mRequest.isWifiOnly()) {
+                conn = NetworkHelper.getInstance(mRequest.getAppContext()).getUrlConnectionOnWifiNetwork(url);
+
+                // If the wifi network is disabled or otherwise unavailable.
+                if (conn == null) {
+                    updateDownloadFailed(DownloadManager.ERROR_WIFI_UNAVAILABLE, "WiFi network is unavailable during UrlConnection creation");
+                    return;
+                }
+            } else {
+                conn = (HttpURLConnection) url.openConnection();
+            }
+
             conn.setInstanceFollowRedirects(false);
             conn.setConnectTimeout(request.getRetryPolicy().getCurrentTimeout());
             conn.setReadTimeout(request.getRetryPolicy().getCurrentTimeout());
