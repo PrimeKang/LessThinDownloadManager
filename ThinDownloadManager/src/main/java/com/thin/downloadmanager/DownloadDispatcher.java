@@ -206,37 +206,39 @@ public class DownloadDispatcher extends Thread {
 
     		File destinationFile = new File(mRequest.getDestinationURI().getPath().toString());
 
-            boolean errorOccurred = false;
+            boolean errorCreatingDestinationFile = false;
             // Create destination file if it doesn't exists
             if (destinationFile.exists() == false) {
                 try {
                     destinationFile.createNewFile();
                 } catch (IOException e) {
                     e.printStackTrace();
-                    errorOccurred = true;
+                    errorCreatingDestinationFile = true;
                     updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR,
                         "Error in creating destination file");
-                    return; // escape to finally to skip transferData()
                 }
             }
 
-            try {
-                out = new FileOutputStream(destinationFile, true);
-                outFd = ((FileOutputStream) out).getFD();
-            } catch (IOException e) {
-            	e.printStackTrace();
-            }
+            // If Destination file couldn't be created. Abort the data transfer.
+            if (errorCreatingDestinationFile == false) {
+                try {
+                    out = new FileOutputStream(destinationFile, true);
+                    outFd = ((FileOutputStream) out).getFD();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
 
-            if (in == null && errorOccurred == false) {
-                updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR, "Error in creating input stream");
+                if (in == null) {
+                    updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR,
+                        "Error in creating input stream");
+                } else if (out == null) {
 
-            } else if (out == null && errorOccurred == false) {
-
-                updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR, "Error in writing download contents to the destination file");
-
-            } else {
-                // Start streaming data
-                transferData(in, out);
+                    updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR,
+                        "Error in writing download contents to the destination file");
+                } else {
+                    // Start streaming data
+                    transferData(in, out);
+                }
             }
 
         } finally {
@@ -391,7 +393,7 @@ public class DownloadDispatcher extends Thread {
     public void updateDownloadFailed(int errorCode, String errorMsg) {
         shouldAllowRedirects = false;
         mRequest.setDownloadState(DownloadManager.STATUS_FAILED);
-        cleanupDestination();
+        if(mRequest.getDeleteOnFailure()) cleanupDestination();
         mDelivery.postDownloadFailed(mRequest, errorCode, errorMsg);
         mRequest.finish();
     }
