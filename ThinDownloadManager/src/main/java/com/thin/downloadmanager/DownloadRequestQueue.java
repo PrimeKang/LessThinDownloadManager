@@ -446,10 +446,11 @@ public class DownloadRequestQueue {
 			if (!requestedNetworkIsActive) registerForWifiConnectedBroadcast(request.getAppContext());
 		}
 
-		cancelActiveDownloadWithSameDestinationUri(request);
-
 		if (DEBUG) Log.d(TAG, "startIfRequestedNetworkIsActive() - requestedNetworkIsActive="+requestedNetworkIsActive);
-		if (requestedNetworkIsActive) mDownloadQueue.add(request);
+		if (requestedNetworkIsActive) {
+			cancelActiveDownloadWithSameDestinationUri(request);
+			mDownloadQueue.add(request);
+		}
 	}
 
 	private boolean atLeastOnePendingWifiOnlyDownload() {
