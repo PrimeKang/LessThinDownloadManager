@@ -46,9 +46,9 @@ public class DownloadRequest implements Comparable<DownloadRequest> {
     /**
      * Whether or not this request has been canceled.
      */
-    private boolean mCanceled = false;
+    private boolean mCancelled = false;
 
-    private boolean mDeleteOnFailure = true;
+    private boolean mDeleteDestinationFileOnFailure = true;
 
     private DownloadRequestQueue mRequestQueue;
 
@@ -207,22 +207,24 @@ public class DownloadRequest implements Comparable<DownloadRequest> {
         return this;
     }
 
-    public boolean getDeleteOnFailure() {
-        return mDeleteOnFailure;
+    public boolean getDeleteDestinationFileOnFailure() {
+        return mDeleteDestinationFileOnFailure;
     }
 
     /**
-     * Set if file should be deleted on download failure. Use is optional: default is to delete.
+     * Set if destination file should be deleted on download failure.
+     * Use is optional: default is to delete.
      */
-    public void setDeleteOnFailure(boolean deleteOnFailure) {
-        mDeleteOnFailure = deleteOnFailure;
+    public DownloadRequest setDeleteDestinationFileOnFailure(boolean deleteOnFailure) {
+        this.mDeleteDestinationFileOnFailure = deleteOnFailure;
+        return this;
     }
 
     /**
      * Mark this request as canceled.  No callback will be delivered.
      */
     public void cancel() {
-        mCanceled = true;
+        mCancelled = true;
     }
 
     //Package-private methods.
@@ -230,8 +232,8 @@ public class DownloadRequest implements Comparable<DownloadRequest> {
     /**
      * Returns true if this request has been canceled.
      */
-    public boolean isCanceled() {
-        return mCanceled;
+    public boolean isCancelled() {
+        return mCancelled;
     }
 
     /**

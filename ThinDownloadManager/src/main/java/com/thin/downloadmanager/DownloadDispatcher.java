@@ -23,6 +23,7 @@ import static java.net.HttpURLConnection.HTTP_INTERNAL_ERROR;
 import static java.net.HttpURLConnection.HTTP_MOVED_PERM;
 import static java.net.HttpURLConnection.HTTP_MOVED_TEMP;
 import static java.net.HttpURLConnection.HTTP_OK;
+import static java.net.HttpURLConnection.HTTP_PARTIAL;
 import static java.net.HttpURLConnection.HTTP_SEE_OTHER;
 import static java.net.HttpURLConnection.HTTP_UNAVAILABLE;
 
@@ -136,6 +137,7 @@ public class DownloadDispatcher extends Thread {
                 + responseCode);
             
             switch (responseCode) {
+                case HTTP_PARTIAL:
                 case HTTP_OK:
                     shouldAllowRedirects = false;
                     if (readResponseHeaders(conn) == 1) {
@@ -210,7 +212,11 @@ public class DownloadDispatcher extends Thread {
             // Create destination file if it doesn't exists
             if (destinationFile.exists() == false) {
                 try {
-                    destinationFile.createNewFile();
+                    if (destinationFile.createNewFile() == false) {
+                        errorCreatingDestinationFile = true;
+                        updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR,
+                            "Error in creating destination file");
+                    }
                 } catch (IOException e) {
                     e.printStackTrace();
                     errorCreatingDestinationFile = true;
@@ -275,10 +281,10 @@ public class DownloadDispatcher extends Thread {
         mRequest.setDownloadState(DownloadManager.STATUS_RUNNING);
         Log.v(TAG, "Content Length: " + mContentLength + " for Download Id " + mRequest.getDownloadId());
         for (;;) {
-            if (mRequest.isCanceled()) {
+            if (mRequest.isCancelled()) {
                 Log.v(TAG, "Stopping the download as Download Request is cancelled for Downloaded Id "+mRequest.getDownloadId());
                 mRequest.finish();
-                updateDownloadFailed(DownloadManager.ERROR_DOWNLOAD_CANCELLED,"Download cancelled");
+                updateDownloadFailed(DownloadManager.ERROR_DOWNLOAD_CANCELLED, "Download cancelled");
                 return;
             }
             int bytesRead = readFromResponse( data, in);
@@ -318,6 +324,8 @@ public class DownloadDispatcher extends Thread {
                 out.write(data, 0, bytesRead);
                 return;
             } catch (IOException ex) {
+                updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR, "IOException when writing download contents to the destination file");
+            } catch (Exception e) {
                 updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR, "IOException when writing download contents to the destination file");
             }
         }
@@ -393,7 +401,9 @@ public class DownloadDispatcher extends Thread {
     public void updateDownloadFailed(int errorCode, String errorMsg) {
         shouldAllowRedirects = false;
         mRequest.setDownloadState(DownloadManager.STATUS_FAILED);
-        if(mRequest.getDeleteOnFailure()) cleanupDestination();
+        if(mRequest.getDeleteDestinationFileOnFailure()) {
+            cleanupDestination();
+        }
         mDelivery.postDownloadFailed(mRequest, errorCode, errorMsg);
         mRequest.finish();
     }
