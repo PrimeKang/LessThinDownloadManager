@@ -226,12 +226,13 @@ class DownloadDispatcher extends Thread {
             // Create destination file if it doesn't exists
             if (!destinationFile.exists()) {
                 try {
-		    // Check path
-                    File parentPath = destinationFile.getParentFile();
-                    if (parentPath != null && !parentPath.exists()) {
-                        parentPath.mkdirs();
+                    // Make path if missing
+                    File path = destinationFile.getParentFile();
+                    if (path != null && !path.exists()) {
+                        path.mkdirs();
                     }
-                    if (!destinationFile.createNewFile()) {
+
+                    if (destinationFile.createNewFile() == false) {
                         errorCreatingDestinationFile = true;
                         updateDownloadFailed(request, DownloadManager.ERROR_FILE_ERROR,
                                 "Error in creating destination file");
