@@ -224,6 +224,11 @@ public class DownloadDispatcher extends Thread {
             // Create destination file if it doesn't exists
             if (destinationFile.exists() == false) {
                 try {
+                    File parentDirFile = destinationFile.getParentFile();
+                    if (parentDirFile != null && !parentDirFile.exists()) {
+                        parentDirFile.mkdirs();
+                    }
+
                     if (destinationFile.createNewFile() == false) {
                         errorCreatingDestinationFile = true;
                         updateDownloadFailed(DownloadManager.ERROR_FILE_ERROR,
