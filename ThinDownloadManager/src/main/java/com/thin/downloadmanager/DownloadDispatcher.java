@@ -116,12 +116,12 @@ class DownloadDispatcher extends Thread {
         HttpURLConnection conn = null;
 
         try {
-            if (mRequest.isWifiOnly()) {
-                conn = NetworkHelper.getInstance(mRequest.getAppContext()).getUrlConnectionOnWifiNetwork(url);
+            if (request.isWifiOnly()) {
+                conn = NetworkHelper.getInstance(request.getAppContext()).getUrlConnectionOnWifiNetwork(url);
 
                 // If the wifi network is disabled or otherwise unavailable.
                 if (conn == null) {
-                    updateDownloadFailed(DownloadManager.ERROR_WIFI_UNAVAILABLE, "WiFi network is unavailable during UrlConnection creation");
+                    updateDownloadFailed(request, DownloadManager.ERROR_WIFI_UNAVAILABLE, "WiFi network is unavailable during UrlConnection creation");
                     return;
                 }
             } else {
@@ -232,7 +232,7 @@ class DownloadDispatcher extends Thread {
                         path.mkdirs();
                     }
 
-                    if (destinationFile.createNewFile() == false) {
+                    if (!destinationFile.createNewFile()) {
                         errorCreatingDestinationFile = true;
                         updateDownloadFailed(request, DownloadManager.ERROR_FILE_ERROR,
                                 "Error in creating destination file");
