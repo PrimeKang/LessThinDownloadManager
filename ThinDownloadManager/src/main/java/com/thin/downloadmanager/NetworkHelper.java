@@ -76,7 +76,8 @@ public class NetworkHelper {
 
         if (sApiLevel >= 21) {
             for(Network network : mConManager.getAllNetworks()) {
-                if(mConManager.getNetworkInfo(network).getType() == networkType) {
+                NetworkInfo networkInfo = mConManager.getNetworkInfo(network);
+                if(networkInfo != null && networkInfo.getType() == networkType) {
                     urlConnection = (HttpURLConnection) network.openConnection(url);
                     if (DEBUG) Log.d(TAG, "getUrlConnectionOnNetwork() - found network with matching networkType="+networkType);
                     break;
